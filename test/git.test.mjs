@@ -143,6 +143,11 @@ test('Markdown neutralizes filenames, specifiers, diagnostics, mentions and cont
   const many = { ...report, findings: Array(200).fill(report.findings[0]) };
   assert.match(renderMarkdown(many), /180 more findings/);
   assert.ok(Buffer.byteLength(renderMarkdown(many)) < 1024 * 1024);
+  const hugeEdge = { from: '😀'.repeat(300), to: '😀'.repeat(300), specifier: '😀'.repeat(300), line: 1 };
+  const huge = { ...report.findings[0], evidence: { base: Array(8).fill(hugeEdge), head: Array(8).fill(hugeEdge) } };
+  const bounded = renderMarkdown({ ...report, findings: Array(20).fill(huge) });
+  assert.ok(Buffer.byteLength(bounded) < 1024 * 1024);
+  assert.match(bounded, /Summary size limit/);
 });
 
 test('bare repositories work and Git environment overrides cannot redirect input', async t => {

@@ -38,5 +38,15 @@ export function renderMarkdown(report: Report): string {
   }
   if (report.findings.length > 20) lines.push(`${report.findings.length - 20} more findings in full reports.`, '');
   lines.push('Summary lists up to 20 findings, 8 edges per snapshot/finding, and 20 notices per snapshot; fields longer than 300 characters are truncated. Download report.json and report.html for complete evidence.', '');
-  return lines.join('\n');
+  const bounded: string[] = [];
+  let bytes = 0;
+  for (const line of lines) {
+    bytes += Buffer.byteLength(line + '\n');
+    if (bytes > 900 * 1024) {
+      bounded.push('', 'Summary size limit reached. Download report.json / report.html for all remaining evidence.', '');
+      break;
+    }
+    bounded.push(line);
+  }
+  return bounded.join('\n');
 }
