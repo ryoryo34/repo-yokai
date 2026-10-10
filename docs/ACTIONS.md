@@ -1,8 +1,8 @@
 # Actions design / Actionsの設計
 
-The [copyable workflow](examples/repo-yokai.yml) and this repository's `Repo Yokai` workflow are identical. The reviewed analyzer is pinned to `3766ed92c9508a4886e24d6fe787989f8d5d3848`, which contains the Git/Markdown implementation and its 21 passing tests. This is an implementation commit, not a release or automatic update channel. Consumers should review that commit and its lockfile before adoption. Changing a target PR cannot select a different analyzer through input refs.
+The [copyable workflow](examples/repo-yokai.yml) and this repository's `Repo Yokai` workflow are identical. The reviewed analyzer is pinned to `29ea5c272f2125aa59439606dc5af65140742f9f`, which contains the Git/Markdown implementation and its 22 passing tests. This is an implementation commit, not a release or automatic update channel. Consumers should review that commit and its lockfile before adoption. Changing a target PR cannot select a different analyzer through input refs.
 
-[導入用workflow](examples/repo-yokai.yml)と本リポジトリの `Repo Yokai` は同じ内容です。信頼する解析器はGit・Markdown実装と21件のテストを含む上記commitに固定しています。リリースや自動更新channelではなく、導入時にcommitとlockfileを確認する前提です。解析対象のrefで実行する解析器の版を切り替えることはできません。
+[導入用workflow](examples/repo-yokai.yml)と本リポジトリの `Repo Yokai` は同じ内容です。信頼する解析器はGit・Markdown実装と22件のテストを含む上記commitに固定しています。リリースや自動更新channelではなく、導入時にcommitとlockfileを確認する前提です。解析対象のrefで実行する解析器の版を切り替えることはできません。
 
 ## Trust boundaries / 信頼境界
 
@@ -35,6 +35,6 @@ Reviewed for Issue #3; no third-party implementation code or artwork was copied.
 - [Git environment](https://git-scm.com/docs/git): `GIT_NO_LAZY_FETCH`, configuration and replacement-object controls.
 - [GitHub job summaries](https://docs.github.com/en/actions/reference/workflows-and-actions/workflow-commands#adding-a-job-summary): `GITHUB_STEP_SUMMARY`, GitHub-flavored Markdown and the 1 MiB per-step limit.
 - [GitHub secure use](https://docs.github.com/en/actions/reference/security/secure-use): least privilege, immutable action pins and untrusted input boundaries.
-- [checkout v4](https://github.com/actions/checkout/tree/11d5960a326750d5838078e36cf38b85af677262), [setup-node v4](https://github.com/actions/setup-node/tree/49933ea5288caeca8642d1e84afbd3f7d6820020), [upload-artifact v4](https://github.com/actions/upload-artifact/tree/ea165f8d65b6e75b540449e92b4886f43607fa02): pinned official actions (MIT).
+- [checkout v7](https://github.com/actions/checkout/tree/3d3c42e5aac5ba805825da76410c181273ba90b1), [setup-node v7](https://github.com/actions/setup-node/tree/949feb2413d6458794dcd2491c4babbbce0c15c1), [upload-artifact v7](https://github.com/actions/upload-artifact/tree/cf430e030ddbb5b0abf93d22962f4752f3646cd9): pinned official actions (MIT).
 
 No new npm dependencies. TypeScript 5.9.3 remains the only runtime dependency (Apache-2.0); `@types/node` is development-only (MIT), with its lockfile-pinned `undici-types` dependency (MIT).

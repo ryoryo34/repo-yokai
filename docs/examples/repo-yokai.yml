@@ -9,17 +9,18 @@ jobs:
     timeout-minutes: 10
     steps:
       - name: Install reviewed analyzer (never use the PR head here)
-        uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262 # v4
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7
         with:
           repository: ryoryo34/repo-yokai
-          ref: 3766ed92c9508a4886e24d6fe787989f8d5d3848
+          ref: 29ea5c272f2125aa59439606dc5af65140742f9f
           path: analyzer
           persist-credentials: false
           submodules: false
           lfs: false
-      - uses: actions/setup-node@49933ea5288caeca8642d1e84afbd3f7d6820020 # v4
+      - uses: actions/setup-node@949feb2413d6458794dcd2491c4babbbce0c15c1 # v7
         with:
           node-version: '22'
+          package-manager-cache: false
       - name: Build only the pinned analyzer
         working-directory: analyzer
         run: |
@@ -62,7 +63,7 @@ jobs:
           esac
           cat "$RUNNER_TEMP/yokai-report/report.md" >> "$GITHUB_STEP_SUMMARY"
       - name: Save HTML, JSON and Markdown
-        uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4
+        uses: actions/upload-artifact@cf430e030ddbb5b0abf93d22962f4752f3646cd9 # v7
         with:
           name: repo-yokai-report
           path: ${{ runner.temp }}/yokai-report/report.*
