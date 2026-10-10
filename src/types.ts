@@ -22,6 +22,7 @@ export interface Finding {
 export interface Rule { id: Finding['ruleId']; detect(snapshot: Snapshot): { key: string; files: string[]; evidence: Evidence[] }[] }
 export interface Report {
   schemaVersion: 1;
+  comparison?: { mode: 'git'; baseSha: string; headSha: string };
   warning: string;
   comparisonPolicy: string;
   findings: Finding[];

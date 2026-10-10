@@ -1,0 +1,71 @@
+name: Repo Yokai
+on:
+  pull_request:
+permissions:
+  contents: read
+jobs:
+  report:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - name: Install reviewed analyzer (never use the PR head here)
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7
+        with:
+          repository: ryoryo34/repo-yokai
+          ref: 29ea5c272f2125aa59439606dc5af65140742f9f
+          path: analyzer
+          persist-credentials: false
+          submodules: false
+          lfs: false
+      - uses: actions/setup-node@949feb2413d6458794dcd2491c4babbbce0c15c1 # v7
+        with:
+          node-version: '22'
+          package-manager-cache: false
+      - name: Build only the pinned analyzer
+        working-directory: analyzer
+        run: |
+          npm ci --ignore-scripts
+          node node_modules/typescript/bin/tsc
+      - name: Fetch target objects without checkout
+        shell: bash
+        env:
+          TARGET_REPOSITORY: ${{ github.repository }}
+          BASE_SHA: ${{ github.event.pull_request.base.sha }}
+          HEAD_SHA: ${{ github.event.pull_request.head.sha }}
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          set -euo pipefail
+          [[ "$TARGET_REPOSITORY" =~ ^[A-Za-z0-9_.-]+/[A-Za-z0-9_.-]+$ ]]
+          [[ "$BASE_SHA" =~ ^[a-f0-9]{40}$ && "$HEAD_SHA" =~ ^[a-f0-9]{40}$ ]]
+          git -c core.hooksPath=/dev/null init --bare "$RUNNER_TEMP/target.git"
+          auth=$(printf 'x-access-token:%s' "$GH_TOKEN" | base64 -w0)
+          echo "::add-mask::$auth"
+          git -C "$RUNNER_TEMP/target.git" -c core.hooksPath=/dev/null \
+            -c "http.extraheader=AUTHORIZATION: basic $auth" \
+            fetch --no-tags --depth=1 "https://github.com/$TARGET_REPOSITORY.git" "$BASE_SHA" "$HEAD_SHA"
+      - name: Analyze committed sources and publish summary
+        id: analyze
+        shell: bash
+        env:
+          BASE_SHA: ${{ github.event.pull_request.base.sha }}
+          HEAD_SHA: ${{ github.event.pull_request.head.sha }}
+        run: |
+          set -euo pipefail
+          set +e
+          node analyzer/dist/cli.js --repo "$RUNNER_TEMP/target.git" \
+            --base "$BASE_SHA" --head "$HEAD_SHA" --output-dir "$RUNNER_TEMP/yokai-report"
+          result=$?
+          set -e
+          case "$result" in
+            0) ;;
+            2) echo '::warning::Repo Yokai coverage is partial; inspect the report.' ;;
+            *) echo '::error::Repo Yokai failed to create a report.'; exit "$result" ;;
+          esac
+          cat "$RUNNER_TEMP/yokai-report/report.md" >> "$GITHUB_STEP_SUMMARY"
+      - name: Save HTML, JSON and Markdown
+        uses: actions/upload-artifact@cf430e030ddbb5b0abf93d22962f4752f3646cd9 # v7
+        with:
+          name: repo-yokai-report
+          path: ${{ runner.temp }}/yokai-report/report.*
+          if-no-files-found: error
+          retention-days: 7
