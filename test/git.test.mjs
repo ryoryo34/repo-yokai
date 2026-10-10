@@ -157,3 +157,21 @@ test('bare repositories work and Git environment overrides cannot redirect input
   assert.equal(result.status, 0, result.stderr);
   const report = JSON.parse(await readFile(path.join(dirs.root, 'output/report.json'), 'utf8')); assert.equal(report.findings[0].status, 'continuing');
 });
+
+
+test('case and Unicode path collisions fail consistently before coalescing directories', async t => {
+  const dirs = await setup(t); await writeFile(path.join(dirs.repo, 'a.ts'), 'export {};'); const base = commit(dirs.repo, 'one');
+  const blob = git(dirs.repo, 'rev-parse', `${base}:a.ts`);
+  function tree(entries) {
+    const result = spawnSync('git', ['-C', dirs.repo, 'mktree', '-z'], { input: entries.join('\0') + '\0', encoding: 'utf8' });
+    assert.equal(result.status, 0, result.stderr); return result.stdout.trim();
+  }
+  for (const [first, second] of [['UPPER', 'upper'], ['é', 'e\u0301']]) {
+    const one = tree([`100644 blob ${blob}\ta.ts`]); const two = tree([`100644 blob ${blob}\tb.ts`]);
+    const root = tree([`040000 tree ${one}\t${first}`, `040000 tree ${two}\t${second}`]);
+    const head = git(dirs.repo, 'commit-tree', root, '-m', 'collision');
+    const result = cli(dirs, base, head); assert.equal(result.status, 1, result.stderr);
+    assert.match(result.stderr, /collision/); assert.deepEqual(await readdir(dirs.temp), []);
+    await absent(path.join(dirs.root, 'output/report.json'));
+  }
+});

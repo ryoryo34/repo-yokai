@@ -56,6 +56,7 @@ async function snapshot(repo: string, sha: string, root: string): Promise<Covera
   const entries = new TextDecoder('utf-8', { fatal: true }).decode(listing).split('\0').filter(Boolean);
   const notices: CoverageNotice[] = [];
   let sourceBytes = 0;
+  const portablePaths = new Map<string, string>();
   for (const entry of entries) {
     const match = /^(\d{6}) (blob|tree|commit) ([a-f0-9]+)\t([\s\S]+)$/.exec(entry);
     if (!match || !oidPattern.test(match[3]!)) throw new Error('Invalid Git tree entry.');
@@ -66,6 +67,13 @@ async function snapshot(repo: string, sha: string, root: string): Promise<Covera
       notices.push({ kind: 'excluded', file: name, message: 'Excluded directory.' }); continue;
     }
     const target = safeSnapshotPath(root, name);
+    for (let length = 1; length <= parts.length; length++) {
+      const prefix = parts.slice(0, length).join('/');
+      const key = prefix.normalize('NFC').toLowerCase();
+      const previous = portablePaths.get(key);
+      if (previous !== undefined && previous !== prefix) throw new Error('Case or Unicode normalization collision in Git tree paths.');
+      portablePaths.set(key, prefix);
+    }
     if (mode === '120000' || mode === '160000') {
       notices.push({ kind: 'blocked', file: name, message: mode === '120000' ? 'Git symlink not followed.' : 'Git submodule not followed.' }); continue;
     }
