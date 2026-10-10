@@ -1,0 +1,48 @@
+name: CI
+on:
+  pull_request:
+  push:
+    branches: [main]
+permissions:
+  contents: read
+jobs:
+  test:
+    # Development CI intentionally tests proposed analyzer code. No secrets or write token.
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262 # v4
+        with:
+          persist-credentials: false
+      - uses: actions/setup-node@49933ea5288caeca8642d1e84afbd3f7d6820020 # v4
+        with:
+          node-version: '22'
+      - run: npm ci --ignore-scripts
+      - run: npm run typecheck
+      - run: npm test
+      - run: npm run build
+      - name: Fictional fixture reports (complete and partial)
+        shell: bash
+        run: |
+          set -euo pipefail
+          node dist/cli.js --base-dir fixtures/demo/base --head-dir fixtures/demo/head --output-dir "$RUNNER_TEMP/demo"
+          mkdir "$RUNNER_TEMP/partial"
+          printf "import 'unsupported-package';\n" > "$RUNNER_TEMP/partial/a.ts"
+          set +e
+          node dist/cli.js --base-dir fixtures/zero/base --head-dir "$RUNNER_TEMP/partial" --output-dir "$RUNNER_TEMP/partial-report"
+          result=$?
+          set -e
+          if [ "$result" -ne 2 ]; then
+            echo 'Partial fixture must produce exit 2'; exit 1
+          fi
+          cat "$RUNNER_TEMP/demo/report.md" >> "$GITHUB_STEP_SUMMARY"
+          cat "$RUNNER_TEMP/partial-report/report.md" >> "$GITHUB_STEP_SUMMARY"
+      - name: Fictional fixture artifacts
+        uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4
+        with:
+          name: fixture-reports
+          path: |
+            ${{ runner.temp }}/demo/report.*
+            ${{ runner.temp }}/partial-report/report.*
+          if-no-files-found: error
+          retention-days: 7

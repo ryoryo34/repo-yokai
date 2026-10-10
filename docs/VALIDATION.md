@@ -14,3 +14,21 @@ Validated on Node.js v25.4.0 / npm 11.7.0.
 - `git diff --check`: passed.
 
 No blocking implementation issues remain within the declared scope. Node.js 22 is the minimum documented version; this local run used Node.js 25, not a cross-version/platform matrix. Unsupported module resolution and concurrent filesystem mutation remain explicitly documented limitations. Additional yokai and GitHub integration were not implemented.
+
+# Issue #3 validation
+
+Local environment: Node.js v25.4.0, npm 11.7.0, Git 2.50.1 (Apple Git-155), macOS.
+
+- `npm run typecheck` and `npm run build`: passed.
+- `npm test`: 21/21 passed (14 existing + 7 Git/Markdown integration tests).
+- Temporary two-commit fixture: new=2, continuing=1, resolved=1; exact SHAs and evidence source lines verified. Annotated tag input resolves to its commit. Repeated JSON/HTML/Markdown output is identical.
+- Dirty tree, staged and untracked files: status, branch, index bytes, staged/unstaged diffs and content preserved; only committed sources analyzed.
+- Symlinks, gitlinks/submodules, root escapes, executable source/config/package scripts, Git fsmonitor/hooks/smudge filters, inherited Git environment overrides and replacement refs: tested without executing the sentinels or following links.
+- Invalid refs, missing shallow history, mixed CLI modes, output overlap/symlinks, existing reports, malicious raw tree traversal: fatal errors; no reports/outside writes. Temporary snapshots removed after success, partial coverage and extraction failure.
+- Markdown injection/control characters and summary size limits: passed. Full SHA/coverage/evidence retained in full reports. Bare repository supported.
+- `actionlint` on both workflows and the copyable example: passed. Example is byte-identical to the actual reporting workflow. Pinned official action SHAs verified through GitHub's API; npm dependency licenses checked locally (no new dependencies).
+- Real local Git CLI comparison from parent `6c1e6de37366d82bef217b0956cdc32a4d819323` to analyzer `3766ed92c9508a4886e24d6fe787989f8d5d3848`: JSON/HTML/Markdown generated; new=0, continuing=5, resolved=0; exit 2, expected because Node/package imports, `.js` to `.ts` resolution and `.mjs` tests are outside scope. The five continuing cycles are the repository's fictional fixtures.
+- Browser: rendered local Git report over loopback HTTP, checked counts, both SHAs, real evidence and partial coverage. HTML remains self-contained; direct `file://` navigation not tested.
+- `git diff --check`: passed.
+
+GitHub Actions results will be recorded after PR creation. Fork-approval/private-repository behavior and Windows remain unverified; the copyable workflow targets GitHub.com hosted Ubuntu runners. No target-repository installation, auto-merge, deployment, PR comment or paid API call is part of this issue.

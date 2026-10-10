@@ -8,9 +8,12 @@ PRの変更に潜む特徴や問題を妖怪として表現する。妖怪には
 
 実際のTypeScript/JavaScriptコードを静的解析し、baseとheadで循環依存が新規・継続・解消したかを判定するCLIと、根拠が読める妖怪HTMLレポートを作る。PR統合前にローカルfixtureで検出の正しさと楽しさを確かめる。
 
+## Issue #3の到達点
+
+Gitのbase/headからcommit済みblobを静的解析し、SHA付きJSON・HTML・MarkdownとGitHub Actionsのsummary・artifactで確認できる。PRコメント投稿と自動マージは行わない。
+
 ## 後続Issueの候補（未着手）
 
-- Gitのbase/head取得とGitHub ActionsからのPRレポート
 - 権限拡大や例外の握りつぶしを根拠付きで検出する追加妖怪
 - 妖怪定義の拡張形式と外部分析器との統合
 
