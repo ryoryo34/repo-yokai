@@ -43,6 +43,9 @@ export const circularDependency: Rule = {
 export async function createReport(baseDir: string, headDir: string): Promise<Report> {
   const base = await analyze(baseDir);
   const head = await analyze(headDir);
+  return compareSnapshots(base, head);
+}
+export function compareSnapshots(base: Snapshot, head: Snapshot): Report {
   const before = new Map(circularDependency.detect(base).map(item => [item.key, item]));
   const after = new Map(circularDependency.detect(head).map(item => [item.key, item]));
   const analysisCoverage = { base: base.analysisCoverage, head: head.analysisCoverage };

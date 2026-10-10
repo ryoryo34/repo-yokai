@@ -5,7 +5,7 @@ import ts from 'typescript';
 import type { AnalysisCoverage, CoverageNotice, Evidence, Snapshot } from './types.js';
 
 const extensions = ['.ts', '.tsx', '.js', '.jsx'];
-const excluded = new Set(['node_modules', '.git', 'dist', 'build', 'coverage', 'out', '.next', '.nuxt']);
+export const excluded = new Set(['node_modules', '.git', 'dist', 'build', 'coverage', 'out', '.next', '.nuxt']);
 export const compareText = (a: string, b: string): number => a < b ? -1 : a > b ? 1 : 0;
 const portable = (p: string): string => p.split(path.sep).join('/');
 export function isWithin(root: string, target: string): boolean {
