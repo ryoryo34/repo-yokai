@@ -37,6 +37,14 @@ Output must not overlap either input tree. Existing `report.json`, `report.html`
 | `2` | Report written, but unsupported/unresolved/blocked references or analysis errors occurred; inspect coverage |
 | `1` | Fatal input, CLI, or output error; a write failure may leave a partial output directory |
 
+## Read the encounter report
+
+Start with the **New / Continuing / Resolved** count links. Cards are grouped in that order and sorted by their stable finding key within each section. Status symbols and character shapes distinguish states without relying only on color; keys and card permalinks are under **Finding key**.
+
+Each expanded snapshot shows an inline dependency diagram: one row is one actual reference, with numbered files and the source line. Rows are not a reconstructed simple cycle. Full paths, line numbers and original specifiers remain in the text evidence. Diagrams are omitted above **8 files or 12 edges** with an explicit explanation; no text evidence is dropped. New/continuing cards open head first; resolved cards open base first and explain that the component was not detected in the analyzed head graph. Next steps vary by status and self-reference. Partial coverage appears both above the report and on affected cards, with a link to coverage notices.
+
+All navigation and disclosure controls work without JavaScript or external assets. See [experience validation and fictional screenshots](docs/EXPERIENCE.md) for keyboard checks, three viewport sizes, zero/partial coverage, and a reproducible fixture preview. Direct `file://` browser testing was blocked by the verification browser policy; loopback HTTP rendering and standalone HTML structure were checked.
+
 ## Compare Git commits
 
 ```sh
