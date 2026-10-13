@@ -39,3 +39,12 @@ GitHub Actions on the first PR revision passed on hosted Ubuntu / Node.js 22:
 - The initial v4 actions emitted a Node.js 20 deprecation warning. The workflow now pins official v7 commits (Node.js 24 action runtime), disables setup-node automatic caching explicitly, and pins the updated analyzer with the collision regression test. Final revision results are checked separately before completion.
 
  Fork-approval/private-repository behavior and Windows remain unverified; the copyable workflow targets GitHub.com hosted Ubuntu runners. No target-repository installation, auto-merge, deployment, PR comment or paid API call is part of this issue.
+
+# Issue #5 validation
+
+- HTML groups new/continuing/resolved, offers count anchors, preserves keys under native details, and uses source-backed inline diagrams with explicit size limits. JSON/Markdown and analyzer behavior remain unchanged.
+- `npm test`: 26/26 passed (22 existing + 4 experience regressions); `npm run typecheck`, `npm run build`, `git diff --check`: passed.
+- Demo remains 2/1/1; JSON is byte-identical to the pre-change demo. Preview generator verifies complete/zero/long/large exits 0 and partial exits 2.
+- Real browser: 15 fixture/viewport combinations at 1280×800, 850×850 and 390×844 without horizontal overflow; count navigation, base/head evidence, key details and keyboard focus checked.
+- Direct `file://` browser navigation was prohibited by the browser policy; offline file execution remains unverified. Inline-only resources, no scripts and restrictive CSP are preserved and tested.
+- See [reproduction steps, screenshots, observations and limits](EXPERIENCE.md). Latest-head hosted CI results are recorded in the PR checks/description.
